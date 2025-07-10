@@ -4,17 +4,20 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 import Button from "../components/Button";
+import Loader from "../components/Loader";
 
 export default function Signup() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const db = getFirestore();
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -32,11 +35,18 @@ export default function Signup() {
       navigate("/dashboard");
     } catch (err) {
       alert(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-300">
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white/60 z-10">
+          <Loader />
+        </div>
+      )}
       <form
         onSubmit={handleSignup}
         className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md"
@@ -103,8 +113,9 @@ export default function Signup() {
         <Button
           type="submit"
           className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors font-semibold text-lg"
+          disabled={loading}
         >
-          Sign Up
+          {loading ? "Signing Up..." : "Sign Up"}
         </Button>
       </form>
     </div>

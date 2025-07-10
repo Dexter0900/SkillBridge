@@ -1,16 +1,23 @@
 import { useState } from "react";
 import gigs from "../data/gigs.json";
-import GigCard from "../components/GigCard";
+import GigCard from "../features/gigs/GigCard";
+import Loader from "../components/Loader";
 
 export default function BrowseGigs() {
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const filteredGigs = gigs.filter((gig) =>
     gig.title.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4">
+    <div className="min-h-screen bg-gray-50 py-10 px-4 relative">
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white/60 z-10">
+          <Loader />
+        </div>
+      )}
       <h1 className="text-3xl font-bold text-blue-700 mb-8 text-center">
         Browse Gigs
       </h1>

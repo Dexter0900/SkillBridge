@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { auth } from "../firebase/firebaseConfig";
-import { onAuthStateChanged } from "firebase/auth";
 import {
   getFirestore,
   doc,
@@ -10,18 +8,19 @@ import {
   where,
   getDocs,
 } from "firebase/firestore";
+import Loader from "../../components/Loader";
+import { useAuthContext } from "../../contexts/AuthContext";
 
 export default function Dashboard() {
-  const [user, setUser] = useState(null);
+  const { user } = useAuthContext();
   const [firstName, setFirstName] = useState("");
   const [appliedGigs, setAppliedGigs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const fetchData = async () => {
       setLoading(true);
       if (user) {
-        setUser(user);
         const db = getFirestore();
         // Fetch first name
         const userDoc = await getDoc(doc(db, "users", user.uid));
@@ -42,14 +41,13 @@ export default function Dashboard() {
         }
         setAppliedGigs(gigs);
       } else {
-        setUser(null);
         setFirstName("");
         setAppliedGigs([]);
       }
       setLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
+    };
+    fetchData();
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4">
@@ -69,7 +67,9 @@ export default function Dashboard() {
                 Applied Gigs
               </h2>
               {loading ? (
-                <div className="text-gray-500">Loading...</div>
+                <div className="flex justify-center py-8">
+                  <Loader />
+                </div>
               ) : appliedGigs.length === 0 ? (
                 <div className="text-gray-500">
                   You have not applied to any gigs yet.

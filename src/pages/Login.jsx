@@ -3,24 +3,34 @@ import { auth } from "../firebase/firebaseConfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate, Link } from "react-router-dom";
 import Button from "../components/Button";
+import Loader from "../components/Loader";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
       navigate("/dashboard");
     } catch (err) {
       alert(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-300">
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white/60 z-10">
+          <Loader />
+        </div>
+      )}
       <form
         onSubmit={handleLogin}
         className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md"
@@ -59,6 +69,7 @@ export default function Login() {
         <Button
           type="submit"
           className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors font-semibold text-lg"
+          disabled={loading}
         >
           Log In
         </Button>

@@ -1,4 +1,4 @@
-import { db, auth } from "../firebase/firebaseConfig";
+import { db, auth } from "../../firebase/firebaseConfig";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 export default function GigCard({ gig }) {
